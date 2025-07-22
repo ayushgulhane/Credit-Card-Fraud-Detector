@@ -1,188 +1,140 @@
-🕵️ Credit Card Fraud Detection API
-Project Overview
-This repository hosts a machine learning model designed for real-time credit card fraud detection. It exposes a Flask-based API endpoint, deployed as a Netlify Serverless Function, that can predict whether a given transaction is legitimate or fraudulent based on various transaction features.
 
-The model is trained on a dataset of credit card transactions, using various anonymized features (V1-V28), transaction Time, and Amount. It aims to help financial institutions and payment gateways identify and prevent fraudulent activities efficiently.
-<img src="https://placehold.co/600x200/cccccc/333333?text=Credit+Card+Fraud+Detection" alt="Credit Card Fraud Detection Illustration" width="600"/>
+# Credit Card Fraud Detection API
 
-Features
-Real-time Prediction: Quickly predicts the likelihood of fraud for new transactions via a REST API.
+This repository contains a complete implementation of a Credit Card Fraud Detection system powered by a Machine Learning model and deployed using Serverless architecture.
 
-Machine Learning Model: Utilizes a pre-trained scikit-learn model (e.g., Logistic Regression, Random Forest, or a custom ensemble) for classification.
+---
 
-Data Preprocessing: Incorporates necessary data scaling for Time and Amount features, consistent with the training pipeline.
+## 📘 Project Summary
 
-Serverless Deployment: Deployed as a Netlify Function for scalability, cost-efficiency, and ease of maintenance.
+This project aims to demonstrate the deployment of a machine learning classification model as an API that detects fraudulent credit card transactions. It uses anonymized transaction data to train a model and exposes a REST API for real-time fraud detection.
 
-CORS Enabled: Allows secure cross-origin requests from frontend applications.
+---
 
-API Endpoints
-The API is deployed on Netlify Functions. Once deployed, you will get a base URL.
-The primary prediction endpoint is:
+## 🌐 Live API
 
-GET /: A simple endpoint to check if the API is running.
+The API is deployed using **Netlify Functions** and allows users to perform fraud predictions through simple HTTP requests.
 
-Response: Fraud Detector API is running! Send POST requests to /predict for predictions.
+- `GET /` - Base endpoint returns a welcome message.
+- `POST /predict` - Accepts transaction data and returns a prediction along with model confidence.
 
-POST /predict: Accepts transaction data and returns a fraud prediction.
+---
 
-Method: POST
+## 🔧 Technologies Used
 
-Content-Type: application/json
+- **Python 3.10+**
+- **scikit-learn** - For model training
+- **pandas & numpy** - Data manipulation and analysis
+- **joblib** - Model serialization
+- **Netlify Functions** - Serverless API deployment
+- **FastAPI or Flask (if local testing is required)**
 
-Request Body Example:
+---
 
+## 🏗️ Folder Structure
+
+```
+├── netlify.toml
+├── my_functions/
+│   ├── fraud_detector.py
+│   ├── fraud_model.joblib
+│   └── scaler.joblib
+└── public/
+    └── .gitkeep
+```
+
+---
+
+## 🧠 Machine Learning Model
+
+The model is trained using a dataset that includes anonymized features (V1-V28), `Time`, and `Amount`. The target variable is `Class` where:
+
+- `0` = Legitimate Transaction
+- `1` = Fraudulent Transaction
+
+### Preprocessing Includes:
+
+- Normalization using `StandardScaler`
+- Feature extraction and cleaning
+- Model training using Logistic Regression, Random Forest, or an ensemble
+
+### Sample Input Format
+
+```json
 {
-  "time": 12345,
-  "amount": 50.75,
-  "v1": 0.1, "v2": 0.2, "v3": 0.3, "v4": 0.4, "v5": 0.5, "v6": 0.6, "v7": 0.7, "v8": 0.8, "v9": 0.9, "v10": 1.0,
-  "v11": 1.1, "v12": 1.2, "v13": 1.3, "v14": 1.4, "v15": 1.5, "v16": 1.6, "v17": 1.7, "v18": 1.8, "v19": 1.9, "v20": 2.0,
-  "v21": 2.1, "v22": 2.2, "v23": 2.3, "v24": 2.4, "v25": 2.5, "v26": 2.6, "v27": 2.7, "v28": 2.8
+  "Time": 472.0,
+  "V1": -1.359807134,
+  "V2": -0.072781173,
+  ...
+  "V28": 0.021879,
+  "Amount": 149.62
 }
+```
 
-Note: All v features (v1 to v28) are mandatory.
+### Sample Output
 
-Response Body Example:
-
-{
-  "result": "Legitimate",
-  "confidence": 99.85
-}
-
-or
-
+```json
 {
   "result": "Fraudulent",
-  "confidence": 75.12
+  "confidence": 91.57
 }
+```
 
-Error Responses:
+---
 
-400 Bad Request: If required data fields are missing or data format is incorrect.
+## 🚀 Deployment Guide
 
-500 Internal Server Error: If the model or scaler files could not be loaded on the server.
+### Step 1: Train Your Model
 
-Deployment on Netlify
-This project is configured for seamless deployment on Netlify Functions.
+Use your local environment to train the model using Jupyter or Python. Save the final model and scaler using `joblib.dump`.
 
-Project Structure
-your-fraud-detection-project/
-├── netlify.toml
-├── requirements.txt
-├── my_functions/             # Contains your function code and model artifacts
-│   ├── fraud_detector.py     # The Flask application acting as the serverless function
-│   ├── fraud_model.joblib    # Your trained machine learning model
-│   └── scaler.joblib         # Your trained scaler for preprocessing
-└── public/                   # Dummy directory required by Netlify for publishing
-    └── .gitkeep              # (Optional: ensures 'public' folder is committed to Git)
+### Step 2: Prepare Your API Script
 
-<img src="https://placehold.co/600x200/cccccc/333333?text=Netlify+Deployment+Architecture" alt="Netlify Deployment Architecture Diagram" width="600"/>
+Write your handler (`fraud_detector.py`) using Netlify function format.
 
-netlify.toml Configuration
-The netlify.toml file configures the build and deployment settings for Netlify:
+### Step 3: Setup Netlify
 
+- Connect your GitHub repo to Netlify
+- Ensure `netlify.toml` is configured properly:
+```toml
 [build]
-  publish = "public" # Points to the dummy public directory
-  command = "echo 'No build command needed for static files'" # No frontend build
+  functions = "my_functions"
+  publish = "public"
+```
 
-[functions]
-  directory = "my_functions" # Specifies the directory where your Python function is
-  node_bundler = "esbuild" # Optional: for faster JS builds, but fine for Python
-  # python_version = "3.9" # Uncomment if you need a specific Python version
+### Step 4: Deploy
 
-Steps to Deploy
-Clone the Repository:
+Push your code and let Netlify handle deployment automatically. The API will be live in seconds.
 
-git clone https://github.com/ayushgulhane/Credit-Card-Fraud-Detector.git
-cd Credit-Card-Fraud-Detector
+---
 
-Ensure Model & Scaler Files: Make sure your trained fraud_model.joblib and scaler.joblib files are placed inside the my_functions/ directory.
+## 🖼️ Screenshots
+<img width="1920" height="930" alt="ccfd1" src="https://github.com/user-attachments/assets/eb64b76f-3f8d-41c3-8c78-910ca18b5fe5" />
 
-Create Dummy public Directory: If you haven't already, create an empty public directory at the root of your project:
+<img width="1920" height="930" alt="ccfd3" src="https://github.com/user-attachments/assets/476cc138-5a27-42c7-a9e6-e0affdbcef97" />
 
-mkdir public
-touch public/.gitkeep # Optional: to ensure it's tracked by Git
+<img width="1920" height="928" alt="ccfd2" src="https://github.com/user-attachments/assets/18a21777-83fa-4092-81e0-6703533b9e56" />
 
-Commit and Push: Commit all your changes and push them to your GitHub repository.
+---
 
-Connect to Netlify:
+## 📌 Use Cases
 
-Go to Netlify and log in.
+- Real-time fraud detection system
+- Backend component of financial dashboards
+- Educational tool for demonstrating ML deployment
+- API integration with mobile or web apps
 
-Click "Add new site" -> "Import an existing project".
+---
 
-Connect your Git provider (GitHub, GitLab, etc.) and select this repository.
+## 📄 License
 
-Netlify will automatically detect your netlify.toml settings. Confirm the build command (echo 'No build command needed for static files') and publish directory (public). Ensure the functions directory is set to my_functions.
+This project is licensed under the MIT License. You are free to use, modify, and distribute it.
 
-Click "Deploy site".
+---
 
-Netlify will then build and deploy your Flask API as a serverless function. You can find the function's URL under the "Functions" tab in your Netlify dashboard.
-<img src="https://placehold.co/600x200/cccccc/333333?text=Netlify+Dashboard+Logs" alt="Netlify Dashboard Logs Screenshot" width="600"/>
+## 🙋 Contact
 
-Local Development & Testing
-To run the Flask API locally for development and testing:
+If you have any questions or suggestions, feel free to open an issue or contact the repository owner.
 
-Create a Virtual Environment (recommended):
+---
 
-python -m venv venv
-source venv/bin/activate # On Windows: .\venv\Scripts\activate
-
-Install Dependencies:
-
-pip install -r requirements.txt
-
-Ensure Model & Scaler: Place your fraud_model.joblib and scaler.joblib files directly in the same directory as fraud_detector.py (i.e., my_functions/).
-
-Run the Flask App: Navigate into the my_functions directory and run the Flask application directly.
-
-cd my_functions
-export FLASK_APP=fraud_detector.py
-flask run
-
-The API will usually be available at http://127.0.0.1:5000/.
-
-Screenshots
-Here are some screenshots of the Credit Card Fraud Detector UI, demonstrating the input fields and prediction output:
-
-Initial Input
-<img src="http://googleusercontent.com/file_content/3" alt="Credit Card Fraud Detector UI - Initial Input" width="600"/>
-
-Transaction Details Input
-<img src="http://googleusercontent.com/file_content/2" alt="Credit Card Fraud Detector UI - Transaction Details" width="600"/>
-
-Legitimate Transaction Prediction
-<img src="http://googleusercontent.com/file_content/1" alt="Credit Card Fraud Detector UI - Legitimate Prediction" width="600"/>
-
-Contributing
-Contributions are welcome! Please feel free to open issues or submit pull requests.
-
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-Future Enhancements
-This project provides a solid foundation for credit card fraud detection. Here are some areas for future development and improvement:
-
-Model Retraining Pipeline: Implement an automated system for retraining the model with new data periodically or when performance metrics indicate a need for an update. This is crucial as fraud patterns evolve over time.
-
-Advanced Feature Engineering: Explore creating more sophisticated features from raw transaction data, such as:
-
-Aggregated features (e.g., number of transactions in the last hour/day/week, average transaction amount for a user).
-
-Time-based features (e.g., time since last transaction, time of day).
-
-Velocity features (e.g., number of transactions from a new IP address).
-
-Explainability (XAI): Integrate tools like SHAP or LIME to provide insights into why a particular transaction was flagged as fraudulent. This can greatly assist human analysts in their investigations.
-
-Feedback Loop: Develop a mechanism for human analysts to provide feedback on model predictions (e.g., marking a false positive as legitimate, or identifying a false negative). This feedback can then be used to continuously improve the model.
-
-Real-time Data Streaming: For higher throughput and lower latency, consider integrating with a real-time data streaming platform (e.g., Apache Kafka, Amazon Kinesis) to process transactions as they occur.
-
-Monitoring Dashboard: Create a comprehensive dashboard to visualize model performance metrics (precision, recall, F1-score, AUC), data drift, and concept drift over time.
-
-Alerting System: Set up automated alerts for anomalies in model performance, data quality issues, or high volumes of suspicious transactions.
-
-User Interface Enhancement: Develop a more interactive and robust frontend application that can handle real-time input, display predictions, and potentially offer options for manual review.
-
-Scalability Improvements: For very high transaction volumes, explore deploying the model on more robust cloud ML platforms (e.g., AWS SageMaker, Google Cloud Vertex AI) that offer advanced scaling and MLOps capabilities.
