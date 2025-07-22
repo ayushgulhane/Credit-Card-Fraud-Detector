@@ -1,0 +1,8 @@
+[build]
+  publish = "public"
+  command = "echo 'No build command needed for static files'" # Or your actual frontend build command if you have one
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild" # Optional: You can specify a bundler for faster builds
+  # python_version = "3.9" # Uncomment and set if you need a specific Python version
