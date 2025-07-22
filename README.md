@@ -1,5 +1,5 @@
 
-# Credit Card Fraud Detection API
+# Credit Card Fraud Detection Model
 
 This repository contains a complete implementation of a Credit Card Fraud Detection system powered by a Machine Learning model and deployed using Serverless architecture.
 
